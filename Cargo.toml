@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 serialport = "4.2.2"
+tokio-modbus = { version = "*", default-features = false, features = ["rtu-sync"] }
+tokio-serial = "5.4.4"
