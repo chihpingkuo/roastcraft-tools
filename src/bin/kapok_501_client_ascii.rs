@@ -11,6 +11,10 @@ fn calc_lrc(frame: &[u8]) -> u8 {
     lrc as u8
 }
 
+fn modbus_ascii() -> () {
+
+}
+
 fn main() {
     let port_name = "COM7";
     let baud_rate = 9600;
@@ -41,13 +45,13 @@ fn main() {
             // let request: [u8; 17] = [0x3A, 0x30, 0x31, 0x30, 0x33, 0x34, 0x37, 0x30, 0x30, 0x30, 
             //                          0x30, 0x30, 0x31, 0x42, 0x34, 0x0D, 0x0A];
 
-            println!("request {:02X?}", request);
+            println!("request  {:02X?}", request);
 
             // loop {
 
                 match port.write(&request) {
                     Ok(_t) => {
-                        println!("send instruction");
+                        println!("send request");
                         
                     },
                     Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
@@ -61,6 +65,11 @@ fn main() {
                     Ok(t) => {
                         println!("response {:02X?}", response);
                         println!(""); 
+                        
+                        let temp_hex_str = std::str::from_utf8(&response[7..11]).expect("invalid utf-8 sequence");
+                        let T1:f32 = u16::from_str_radix(temp_hex_str, 16).unwrap() as f32 / 10.0;
+                        
+                        println!("T1 ET {}", T1);
                         
                     },
                     Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
