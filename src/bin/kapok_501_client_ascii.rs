@@ -3,6 +3,8 @@ use std::io::{self, Write, Read};
 use std::time::Duration;
 use std::{thread, time};
 
+use serialport::SerialPort;
+
 fn calc_lrc(frame: &[u8]) -> u8 {
     let mut lrc: i32 = 0;
     for i in 0..frame.len() {
@@ -11,24 +13,11 @@ fn calc_lrc(frame: &[u8]) -> u8 {
     lrc as u8
 }
 
-fn modbus_ascii() -> () {
-
-}
-
-fn main() {
-    let port_name = "COM7";
-    let baud_rate = 9600;
-
-    let mut port = serialport::new(port_name, baud_rate)
-        .timeout(Duration::from_millis(100))
-        .open().expect("Failed to open port");         
-
-    println!("{} connected",port_name);
-
-    let pdu: String = format!("{:02X}", 1) +     // slave address
-                        &format!("{:02X}", 3) +     // function (read holding register)
-                        &format!("{:02X}", 18176) + // holding register address
-                        &format!("{:04X}", 1);      // quantity
+fn modbus_ascii(mut port: Box<dyn SerialPort>, address: u8) -> () {
+    let pdu: String = format!("{:02X}", address) + // slave address
+                     &format!("{:02X}", 3) +       // function (read holding register)
+                     &format!("{:02X}", 18176) +   // holding register address
+                     &format!("{:04X}", 1);        // quantity
 
     let lrc: u8 = calc_lrc(hex::decode(&pdu).unwrap().as_slice());
 
@@ -62,13 +51,30 @@ fn main() {
             println!(""); 
             
             let temp_hex_str = std::str::from_utf8(&response[7..11]).expect("invalid utf-8 sequence");
-            let T1:f32 = u16::from_str_radix(temp_hex_str, 16).unwrap() as f32 / 10.0;
+            let Temp:f32 = u16::from_str_radix(temp_hex_str, 16).unwrap() as f32 / 10.0;
             
-            println!("T1 ET {}", T1);
+            println!("Temp @ {}, {}", address, Temp);
             
         },
         Err(ref e) if e.kind() == io::ErrorKind::TimedOut => (),
         Err(e) => eprintln!("{:?}", e),
     }
-       
+}
+
+fn main() {
+    let port_name = "COM7";
+    let baud_rate = 9600;
+
+    let mut port = serialport::new(port_name, baud_rate)
+        .timeout(Duration::from_millis(100))
+        .open().expect("Failed to open port");         
+
+    println!("{} connected",port_name);
+
+    loop {
+        modbus_ascii(port.try_clone().unwrap(),1);
+        modbus_ascii(port.try_clone().unwrap(),2);
+        modbus_ascii(port.try_clone().unwrap(),3);
+        thread::sleep(time::Duration::from_secs(5));
+    }
 }
