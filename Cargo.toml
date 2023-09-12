@@ -9,3 +9,4 @@ edition = "2021"
 serialport = "4.2.2"
 tokio-modbus = { version = "*", default-features = false, features = ["rtu-sync"] }
 tokio-serial = "5.4.4"
+hex = "0.4"
