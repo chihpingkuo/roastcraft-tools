@@ -50,6 +50,8 @@ fn modbus_ascii(mut port: Box<dyn SerialPort>, address: u8) -> () {
             println!("response {:02X?}", response);
             println!(""); 
             
+            // TODO: add address check and LRC check
+
             let temp_hex_str = std::str::from_utf8(&response[7..11]).expect("invalid utf-8 sequence");
             let Temp:f32 = u16::from_str_radix(temp_hex_str, 16).unwrap() as f32 / 10.0;
             
@@ -65,7 +67,7 @@ fn main() {
     let port_name = "COM7";
     let baud_rate = 9600;
 
-    let mut port = serialport::new(port_name, baud_rate)
+    let port = serialport::new(port_name, baud_rate)
         .timeout(Duration::from_millis(100))
         .open().expect("Failed to open port");         
 

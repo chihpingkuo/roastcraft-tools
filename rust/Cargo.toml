@@ -1,5 +1,5 @@
 [package]
-name = "roastcraft-util"
+name = "roastcraft-tools"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,6 +7,9 @@ edition = "2021"
 
 [dependencies]
 serialport = "4.2.2"
-tokio-modbus = { version = "*", default-features = false, features = ["rtu-sync"] }
+tokio-modbus = { version = "*", default-features = false, features = [
+    "rtu-sync",
+] }
 tokio-serial = "5.4.4"
 hex = "0.4"
+tokio = { version = "1.32.0", features = ["full"] }
