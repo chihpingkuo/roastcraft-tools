@@ -2,7 +2,7 @@ use tokio_modbus::prelude::*;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let tty_path = "COM3";
+    let tty_path = "COM4";
     let slave = Slave(1);
 
     let builder = tokio_serial::new(tty_path, 9600);
