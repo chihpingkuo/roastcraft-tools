@@ -19,6 +19,7 @@ fn main() {
 
     // create request object
     let mut mreq = ModbusRequest::new(1, ModbusProto::Ascii);
+
     let mut request = Vec::new();
 
     // get holding registers
@@ -26,7 +27,6 @@ fn main() {
 
     let mut request_ascii = Vec::new();
     generate_ascii_frame(&request, &mut request_ascii).unwrap();
-
     stream.write(&request_ascii).unwrap();
 
     let mut buf = [0u8; 7];
@@ -39,12 +39,12 @@ fn main() {
         stream.read_exact(&mut rest).unwrap();
         response_ascii.extend(rest);
     }
-    println!("  len {:?}", len);
-    println!("ascii {:02X?}", response_ascii);
+    println!("     len {:?}", len);
+    println!("   ascii {:02X?}", response_ascii);
 
     let mut response = vec![0; (len as usize - 3) / 2];
     parse_ascii_frame(&response_ascii, len as usize, &mut response, 0).unwrap();
-    println!("  hex {:02X?}", response);
+    println!("response {:02X?}", response);
     let mut data = Vec::new();
     // check if frame has no Modbus error inside and parse response bools into data vec
     mreq.parse_u16(&response, &mut data).unwrap();

@@ -18,11 +18,6 @@ fn main() {
 
     println!("{} connected", port_name);
 
-    // open TCP connection
-    // let mut stream = TcpStream::connect("localhost:502").unwrap();
-    // stream.set_read_timeout(Some(timeout)).unwrap();
-    // stream.set_write_timeout(Some(timeout)).unwrap();
-
     // create request object
     let mut mreq = ModbusRequest::new(1, ModbusProto::Rtu);
     let mut request = Vec::new();
@@ -31,13 +26,13 @@ fn main() {
     mreq.generate_get_holdings(18176, 1, &mut request).unwrap();
     println!("{:02X?}", request);
     stream.write(&request).unwrap();
-    let mut buf = [0u8; 6];
+    let mut buf = [0u8; 7];
     stream.read_exact(&mut buf).unwrap();
     let mut response = Vec::new();
     response.extend_from_slice(&buf);
     let len = guess_response_frame_len(&buf, ModbusProto::Rtu).unwrap();
-    if len > 6 {
-        let mut rest = vec![0u8; (len - 6) as usize];
+    if len > 7 {
+        let mut rest = vec![0u8; (len - 7) as usize];
         stream.read_exact(&mut rest).unwrap();
         response.extend(rest);
     }

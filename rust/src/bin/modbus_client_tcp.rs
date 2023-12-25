@@ -19,13 +19,13 @@ fn main() {
     // get holding registers
     mreq.generate_get_holdings(18176, 1, &mut request).unwrap();
     stream.write(&request).unwrap();
-    let mut buf = [0u8; 6];
+    let mut buf = [0u8; 7];
     stream.read_exact(&mut buf).unwrap();
     let mut response = Vec::new();
     response.extend_from_slice(&buf);
     let len = guess_response_frame_len(&buf, ModbusProto::TcpUdp).unwrap();
-    if len > 6 {
-        let mut rest = vec![0u8; (len - 6) as usize];
+    if len > 7 {
+        let mut rest = vec![0u8; (len - 7) as usize];
         stream.read_exact(&mut rest).unwrap();
         response.extend(rest);
     }
